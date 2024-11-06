@@ -86,7 +86,12 @@ int main(int argc, char* argv[])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     Shader ourShader("src/shaders/textured.vert", "src/shaders/textured.frag");
-    Texture ourTexture("res/textures/container.jpg");
+    Texture containerTexture("res/textures/container.jpg");
+    Texture faceTexture("res/textures/awesomeface.png", true);
+
+    ourShader.useShader();
+    ourShader.setInt("texture1", 0);
+    ourShader.setInt("texture2", 1);
     
     while(!glfwWindowShouldClose(window))
     {
@@ -95,10 +100,12 @@ int main(int argc, char* argv[])
         glClearColor(0.2f, 0.3f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
-        ourShader.useShader();
-        ourTexture.bindTexture();
+        containerTexture.bindTexture(0);
+        faceTexture.bindTexture(1);
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);        
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        Texture::unbindTexture(0);
+        Texture::unbindTexture(1);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

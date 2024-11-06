@@ -173,6 +173,7 @@
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="res\textures\awesomeface.png" />
     <Content Include="res\textures\container.jpg" />
     <Content Include="res\textures\wall.jpg" />
     <Content Include="src\shaders\justcolor.frag" />
