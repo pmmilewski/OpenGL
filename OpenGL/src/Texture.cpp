@@ -2,18 +2,20 @@
 
 #include <iostream>
 #include <ostream>
-#include <glad/glad.h>
 #include "stb_image.h"
 
-Texture::Texture(const char* imagePath, bool flip_vertically_on_load)
+Texture::Texture(const char* imagePath, bool flip_vertically_on_load,
+    int wrapS, int wrapT,
+    int minFilter, int magFilter,
+    bool mipMap)
 {
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(flip_vertically_on_load);
@@ -29,7 +31,10 @@ Texture::Texture(const char* imagePath, bool flip_vertically_on_load)
         else
         {
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
+            if (mipMap)
+            {
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
         }
     }
     else
