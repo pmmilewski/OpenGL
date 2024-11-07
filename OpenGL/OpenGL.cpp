@@ -4,8 +4,11 @@
 #include <GLFW/glfw3.h>
 
 #include "src/Shader.h"
-#include "stb_image.h"
 #include "src/Texture.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -99,6 +102,11 @@ int main(int argc, char* argv[])
 
         glClearColor(0.2f, 0.3f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glm::mat4 transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        ourShader.setMatrix4("transform", transform);
         
         containerTexture.bindTexture(0);
         faceTexture.bindTexture(1);
