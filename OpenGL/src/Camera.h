@@ -21,6 +21,7 @@ public:
         float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f,
         float yaw = YAW, float pitch = PITCH);
 
+    virtual ~Camera() = default;
     
     glm::vec3 Position;
     glm::vec3 Front;
@@ -39,7 +40,7 @@ public:
     
     glm::mat4 GetCameraMatrix() const;
     float GetZoom() const;
-    void MoveCamera(glm::vec3 directionsFRU, float deltaTime);
+    virtual void MoveCamera(glm::vec3 directionsFRU, float deltaTime);
     void RotateCamera(float xOffset, float yOffset, float deltaTime, bool constrainPitch = true);
     void ZoomCamera(float yOffset, float deltaTime);
 
@@ -47,6 +48,6 @@ public:
     void SetRotationSpeed(float newValue);
     void SetZoomSpeed(float newValue);
 
-private:
+protected:
     void UpdateCameraState();
 };

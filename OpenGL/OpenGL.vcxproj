@@ -161,6 +161,7 @@
     <ClCompile Include="include\glm\glm.cppm" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
@@ -599,6 +600,7 @@
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>

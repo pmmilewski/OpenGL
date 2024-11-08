@@ -11,8 +11,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "src/Camera.h"
+#include "src/FPSCamera.h"
 
-auto camera = Camera(glm::vec3(0.0f, 0.0f, 5.0f));
+auto camera = FPSCamera(glm::vec3(0.0f, 0.0f, 5.0f));
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
