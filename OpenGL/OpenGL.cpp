@@ -13,7 +13,7 @@
 #include "src/Camera.h"
 #include "src/FPSCamera.h"
 
-auto camera = FPSCamera(glm::vec3(0.0f, 0.0f, 5.0f));
+auto camera = Camera(glm::vec3(0.0f, 0.0f, 5.0f));
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -140,29 +140,24 @@ int main(int argc, char* argv[])
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
     
-    unsigned int indices[] = {
-        0, 1, 3,
-        1, 2, 3
-    };  
-
-    unsigned int VBO, VAO, EBO;
+    unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
     
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    unsigned int lightVAO;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -170,26 +165,11 @@ int main(int argc, char* argv[])
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    Shader ourShader("src/shaders/textured.vert", "src/shaders/textured.frag");
-    Texture containerTexture("res/textures/container.jpg");
-    Texture faceTexture("res/textures/awesomeface.png", true);
-    
-    ourShader.useShader();
-    ourShader.setInt("texture1", 0);
-    ourShader.setInt("texture2", 1);
+    Shader lightingShader("src/shaders/lighting.vert", "src/shaders/lighting.frag");
+    Shader lightCubeShader("src/shaders/lightCube.vert", "src/shaders/lightCube.frag");
 
-    glm::vec3 cubePositions[] = {
-        glm::vec3( 0.0f,  0.0f,  0.0f), 
-        glm::vec3( 2.0f,  5.0f, -15.0f), 
-        glm::vec3(-1.5f, -2.2f, -2.5f),  
-        glm::vec3(-3.8f, -2.0f, -12.3f),  
-        glm::vec3( 2.4f, -0.4f, -3.5f),  
-        glm::vec3(-1.7f,  3.0f, -7.5f),  
-        glm::vec3( 1.3f, -2.0f, -2.5f),  
-        glm::vec3( 1.5f,  2.0f, -2.5f), 
-        glm::vec3( 1.5f,  0.2f, -1.5f), 
-        glm::vec3(-1.3f,  1.0f, -1.5f)  
-    };
+    glm::vec3 objectPos(0.0f, 0.0f, 0.0f);
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
     
     while(!glfwWindowShouldClose(window))
     {
@@ -202,35 +182,42 @@ int main(int argc, char* argv[])
         glClearColor(0.2f, 0.3f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        containerTexture.bindTexture(0);
-        faceTexture.bindTexture(1);
-        glBindVertexArray(VAO);
-        
         glm::mat4 view = camera.GetCameraMatrix();
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(camera.GetZoom()), 800.0f / 600.0f, 0.1f, 100.0f);
-        ourShader.setMatrix4("view", view);
-        ourShader.setMatrix4("projection", projection);
 
-        for (int i = 0; i < 10; ++i)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-            ourShader.setMatrix4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        lightingShader.useShader();
+        glBindVertexArray(VAO);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, objectPos);
         
-        Texture::unbindTexture(0);
-        Texture::unbindTexture(1);
+        lightingShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+        lightingShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        lightingShader.setMatrix4("model", model);
+        lightingShader.setMatrix4("view", view);
+        lightingShader.setMatrix4("projection", projection);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        lightCubeShader.useShader();
+        glBindVertexArray(lightVAO);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
+        lightCubeShader.setMatrix4("model", model);
+        lightCubeShader.setMatrix4("view", view);
+        lightCubeShader.setMatrix4("projection", projection);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBO);
-    ourShader.deleteShader();
+    lightingShader.deleteShader();
+    lightCubeShader.deleteShader();
     
     glfwTerminate();
     return 0;

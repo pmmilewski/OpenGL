@@ -612,6 +612,10 @@
     <Content Include="res\textures\wall.jpg" />
     <Content Include="src\shaders\justcolor.frag" />
     <Content Include="src\shaders\justcolor.vert" />
+    <Content Include="src\shaders\lightCube.frag" />
+    <Content Include="src\shaders\lightCube.vert" />
+    <Content Include="src\shaders\lighting.frag" />
+    <Content Include="src\shaders\lighting.vert" />
     <Content Include="src\shaders\textured.frag" />
     <Content Include="src\shaders\textured.vert" />
   </ItemGroup>
